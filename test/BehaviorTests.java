@@ -3,7 +3,6 @@ import org.junit.Assert.*;
 import org.math.plot.*;
 
 import javax.swing.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -45,6 +44,7 @@ public class BehaviorTests {
         int trials = 20;
 
         // train and evaluate for each slice of dataset
+        // todo split into trainAndEval()
         for (int size = 1; size <= datasetSize.length; size++) {
             int testAccuracy = 0;
 
@@ -58,8 +58,8 @@ public class BehaviorTests {
                         .range(0, testData.length)
                         .filter(result ->
                                 classifier
-                                .classification()[result]
-                                .equals(testData[result][testData[0].length - 1]))
+                                        .classification()[result]
+                                        .equals(testData[result][testData[0].length - 1]))
                         .count() / testData.length;
             }
 
