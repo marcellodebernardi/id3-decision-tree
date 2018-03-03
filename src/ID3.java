@@ -18,6 +18,9 @@ class ID3 {
     private String[][] strings;         // Unique strings for each attribute
     private int[] stringCount;          // Number of unique strings for each attribute
 
+    // temporary
+    private String[] lastClassification;
+
 
     public ID3() {
         attributes = 0;
@@ -29,6 +32,18 @@ class ID3 {
     }
 
 
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+        if (args.length != 2) error("Expected 2 arguments: file names of training and test data");
+
+        String[][] trainingData = parseCSV(args[0]);
+        String[][] testData = parseCSV(args[1]);
+
+        ID3 classifier = new ID3();
+        classifier.train(trainingData);
+        classifier.printTree();
+        classifier.classify(testData);
+    }
+
     /**
      * Execute the decision tree on the given examples in testData, and print
      * the resulting class names, one to a line, for each example in testData.
@@ -36,6 +51,13 @@ class ID3 {
     public void classify(String[][] testData) {
         if (decisionTree == null) error("Please run training phase before classification");
         // PUT  YOUR CODE HERE FOR CLASSIFICATION
+
+        lastClassification = new String[0];
+    }
+
+    public String[] classification() {
+        if (lastClassification == null) throw new NullPointerException("No classification has been run yet.");
+        else return lastClassification;
     }
 
     public void train(String[][] trainingData) {
@@ -47,6 +69,7 @@ class ID3 {
         if (decisionTree == null) error("Attempted to print null Tree");
         else System.out.println(decisionTree);
     }
+
 
     /**
      * Given a 2-dimensional array containing the training data, numbers each
@@ -61,15 +84,18 @@ class ID3 {
         attributes = data[0].length;
         stringCount = new int[attributes];
         strings = new String[attributes][examples];// might not need all columns
+
         int index = 0;
         for (int attr = 0; attr < attributes; attr++) {
             stringCount[attr] = 0;
+
             for (int ex = 1; ex < examples; ex++) {
                 for (index = 0; index < stringCount[attr]; index++)
-                    if (data[ex][attr].equals(strings[attr][index]))
-                        break;    // we've seen this String before
-                if (index == stringCount[attr])        // if new String found
-                    strings[attr][stringCount[attr]++] = data[ex][attr];
+                    // seen this string before
+                    if (data[ex][attr].equals(strings[attr][index])) break;
+
+                // new string found
+                if (index == stringCount[attr]) strings[attr][stringCount[attr]++] = data[ex][attr];
             }
         }
     }
@@ -91,33 +117,35 @@ class ID3 {
      * on each line, and returns a two dimensional array of these values,
      * indexed by line number and position in line.
      **/
-    static String[][] parseCSV(String fileName)
-            throws FileNotFoundException, IOException {
+    static String[][] parseCSV(String fileName) throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
+
+        // compute number of fields per line and number of lines
         String s = br.readLine();
         int fields = 1;
         int index = 0;
-        while ((index = s.indexOf(',', index) + 1) > 0)
-            fields++;
         int lines = 1;
-        while (br.readLine() != null)
-            lines++;
+
+        while ((index = s.indexOf(',', index) + 1) > 0) fields++;
+        while (br.readLine() != null) lines++;
         br.close();
+
+        // scan through file again to obtain data
         String[][] data = new String[lines][fields];
         Scanner sc = new Scanner(new File(fileName));
         sc.useDelimiter("[,\n]");
+
         for (int l = 0; l < lines; l++)
             for (int f = 0; f < fields; f++)
-                if (sc.hasNext())
-                    data[l][f] = sc.next();
-                else
-                    error("Scan error in " + fileName + " at " + l + ":" + f);
+                if (sc.hasNext()) data[l][f] = sc.next();
+                else error("Scan error in " + fileName + " at " + l + ":" + f);
+
         sc.close();
         return data;
-    } // parseCSV()
+    }
 
     /**
-     * Print error message and exit.
+     * HELPER: Print error message and exit.
      **/
     static void error(String msg) {
         System.err.println("Error: " + msg);
@@ -127,18 +155,6 @@ class ID3 {
     // HELPER: todo
     static double xlogx(double x) {
         return x == 0 ? 0 : x * Math.log(x) / LOG2;
-    }
-
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-        if (args.length != 2) error("Expected 2 arguments: file names of training and test data");
-
-        String[][] trainingData = parseCSV(args[0]);
-        String[][] testData = parseCSV(args[1]);
-
-        ID3 classifier = new ID3();
-        classifier.train(trainingData);
-        classifier.printTree();
-        classifier.classify(testData);
     }
 
 
@@ -160,18 +176,19 @@ class ID3 {
      * to the class label strings[attributes-1][3].
      **/
     class TreeNode {
-
         TreeNode[] children;
         int value;
+
 
         public TreeNode(TreeNode[] ch, int val) {
             value = val;
             children = ch;
-        } // constructor
+        }
 
+        @Override
         public String toString() {
             return toString("");
-        } // toString()
+        }
 
         String toString(String indent) {
             if (children != null) {
@@ -182,9 +199,10 @@ class ID3 {
                             children[i].toString(indent + '\t');
                 return s;
             }
-            else
+            else {
                 return indent + "Class: " + strings[attributes - 1][value] + "\n";
-        } // toString(String)
+            }
+        }
 
-    } // inner class TreeNode
-} // class ID3
+    }
+}
