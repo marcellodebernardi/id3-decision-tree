@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2018.3.1)  22 MAR 2018 18:23
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2018.3.1)  22 MAR 2018 18:36
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -554,18 +554,19 @@ e
 {c:/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (./report.aux) 
 ) 
 Here is how much of TeX's memory you used:
- 13795 strings out of 492982
- 289870 string characters out of 6136226
+ 13800 strings out of 492982
+ 289922 string characters out of 6136226
  334398 words of memory out of 5000000
- 17115 multiletter control sequences out of 15000+600000
- 3938 words of font info for 15 fonts, out of 8000000 for 9000
+ 17118 multiletter control sequences out of 15000+600000
+ 4544 words of font info for 17 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  62i,5n,65p,428b,191s stack positions out of 5000i,500n,10000p,200000b,80000s
-<c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb>
-Output written on report.pdf (1 page, 9271 bytes).
+<c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texl
+ive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb>
+Output written on report.pdf (1 page, 19498 bytes).
 PDF statistics:
- 15 PDF objects out of 1000 (max. 8388607)
- 10 compressed objects within 1 object stream
+ 19 PDF objects out of 1000 (max. 8388607)
+ 13 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 

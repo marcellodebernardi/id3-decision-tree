@@ -127,7 +127,7 @@ class ID3 {
     private TreeNode id3(Dataset dataset, List<Integer> attributeIndices) {
         // all examples have same class
         if (dataset.isPerfectlyClassified()) {
-            return new TreeNode(null, dataset.classes.indexOf(dataset.examples.get(0).cls()));
+            return new TreeNode(null, dataset.firstClass());
         }
         // no more attributes to split by
         else if (attributeIndices.isEmpty()) {
@@ -534,6 +534,17 @@ class ID3 {
             }
 
             return majorityClass;
+        }
+
+        /**
+         * Returns the class index for the class of the first data point in the dataset.
+         * Useful when dataset is perfectly classified and it is unnecessary to iterate
+         * again over entire dataset to determine majority class.
+         *
+         * @return class index for first data point's class
+         */
+        int firstClass() {
+            return classes.indexOf(examples.get(0).cls());
         }
 
         @Override
