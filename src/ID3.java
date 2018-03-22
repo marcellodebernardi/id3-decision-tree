@@ -12,7 +12,6 @@ import java.util.stream.IntStream;
 
 
 class ID3 {
-    // TODO: 3/4/2018 refactor data structures to allow simplified algorithms
     static final double LOG2 = Math.log(2.0);
     private int attributes;             // Number of attributes (including the class)
     private int examples;               // Number of training examples
@@ -21,10 +20,10 @@ class ID3 {
     private String[][] labels;          // Unique labels for each attribute
     private int[] stringCount;          // Number of unique labels for each attribute
 
-    // temporary
-    String[] lastClassification;
-    int classCount;
 
+    /**
+     * Classifier constructor.
+     */
     public ID3() {
         attributes = 0;
         examples = 0;
@@ -35,6 +34,13 @@ class ID3 {
     }
 
 
+    /**
+     * Application entry point for classifier testing.
+     *
+     * @param args file names for training and test data
+     * @throws FileNotFoundException if file not found
+     * @throws IOException           generic IO exception
+     */
     public static void main(String[] args) throws FileNotFoundException, IOException {
         if (args.length != 2) error("Expected 2 arguments: file names of training and test data");
 
@@ -47,6 +53,7 @@ class ID3 {
         classifier.classify(testData);
     }
 
+
     /**
      * Carry out construction of the decision tree based on the examples in
      * trainingData.
@@ -56,7 +63,9 @@ class ID3 {
     public void train(String[][] trainingData) {
         indexStrings(trainingData);
 
-        // initiate ID3 with list of attribute indices that includes all indices
+        // after calling indexStrings(), trainingData[][] is converted to a Dataset
+        // object which abstracts array manipulations in order to make the code
+        // directly implementing ID3 more legible
         decisionTree = id3(
                 new Dataset(data, labels),
                 IntStream.range(0, labels.length - 1).boxed().collect(Collectors.toList())
@@ -64,26 +73,22 @@ class ID3 {
     }
 
     /**
-     * Execute the decision tree on the given examples in testData, and print
-     * the resulting class names, one to a line, for each example in testData.
-     **/
+     * Output a classification result for each data point in the testData[][]
+     * matrix.
+     *
+     * @param testData 2D array of data points, indexed as [example][attribute]
+     */
     public void classify(String[][] testData) {
         if (decisionTree == null) error("Please run training phase before classification");
 
-        for (int i = 1; i < testData.length; i++) {
-            String[] example = testData[i];
-            int predictedClass = classify(example, decisionTree);
-            System.out.println(labels[attributes - 1][predictedClass]);
-        }
-
-        lastClassification = new String[0];
+        String[] classes = labels[attributes - 1];
+        for (int i = 1; i < testData.length; i++)
+            System.out.println(classes[classify(testData[i], decisionTree)]);
     }
 
-    public String[] classification() {
-        if (lastClassification == null) throw new NullPointerException("No classification has been run yet.");
-        else return lastClassification;
-    }
-
+    /**
+     * Prints the learned decision tree to standard output.
+     */
     public void printTree() {
         if (decisionTree == null) error("Attempted to print null Tree");
         else System.out.println(decisionTree);
@@ -101,25 +106,38 @@ class ID3 {
     private int classify(String[] example, TreeNode node) {
         // leaf node
         if (node.children == null || node.children.length == 0) return node.value;
-        // non-leaf node
+            // non-leaf node
         else return classify(example, node.children[indexOf(example[node.value], labels[node.value])]);
     }
 
     /**
      * Executes the iterative dichotomizer 3 algorithm on the training dataset.
-     * Returns the root node of the resulting decision tree.
+     * Returns the root node of the resulting decision tree. The attributeIndices
+     * parameter is used to indicate which attributes are still to be tested at
+     * the current sub-tree.
+     * <p>
+     * That is, for example, if the data set originally had
+     * 4 distinct attributes, and attribute 3 has already been used, the argument
+     * to attributeIndices should be [0, 1, 2].
+     *
+     * @param dataset          Dataset object representing data points to elicit nodes for
+     * @param attributeIndices remaining attributes for splitting
+     * @return TreeNode representing decision tree
      */
     private TreeNode id3(Dataset dataset, List<Integer> attributeIndices) {
-        // all examples have same class OR no more attributes to split on
-        if (dataset.isPerfectlyClassified() || attributeIndices.isEmpty()) {
+        // all examples have same class
+        if (dataset.isPerfectlyClassified()) {
+            return new TreeNode(null, dataset.classes.indexOf(dataset.examples.get(0).cls()));
+        }
+        // no more attributes to split by
+        else if (attributeIndices.isEmpty()) {
             return new TreeNode(null, dataset.majorityClass());
         }
-        // else split by best attribute and handle subsets
+        // else split by best attribute and handle subsets (including empty)
         else {
             int question = nextQuestion(dataset, attributeIndices);
 
             List<Dataset> subsets = dataset.splitByAttribute(question);
-
             attributeIndices = new ArrayList<>(attributeIndices);
             attributeIndices.remove((Integer) question);
 
@@ -136,14 +154,19 @@ class ID3 {
     }
 
     /**
-     * Given a 2D array of examples and a 2D array of the remaining untested
+     * Given a dataset of examples and a list of the remaining untested
      * attributes, returns the index to the row in the attribute matrix that
-     * identifies the most significant attribute for splitting the examples.
+     * identifies the attribute with the highest information gain.
+     *
+     * @param dataset          remaining data points
+     * @param attributeIndices remaining attributes to test
+     * @return index of attribute with highest information gain
      */
     private int nextQuestion(Dataset dataset, List<Integer> attributeIndices) {
         double maxInformationGain = Double.MIN_VALUE;
         int bestAttribute = attributeIndices.get(0);
 
+        // compute information gain for splitting dataset using each attribute
         for (Integer att : attributeIndices) {
             double informationGain = informationGain(dataset, att);
 
@@ -160,33 +183,32 @@ class ID3 {
      * Computes the information gain for splitting the dataset on the given
      * attribute. Used to select the next best attribute to split on in the
      * decision tree.
+     *
+     * @param data dataset to split
+     * @param attributeIndex attribute to split with
+     * @return information gained by splitting with this attribute
      */
     private double informationGain(Dataset data, int attributeIndex) {
         List<Dataset> subsets = data.splitByAttribute(attributeIndex);
-
         double subsetsEntropy = 0;
 
+        // sum of entropy of each subset
         for (Dataset subset : subsets)
             subsetsEntropy += ((double) subset.size() / (double) data.size()) * subset.entropy();
 
-        // change in entropy from splitting on this attribute
+        // overall change in entropy from splitting on this attribute
         return data.entropy() - subsetsEntropy;
     }
 
     /**
      * HELPER: determines the index of a particular string in a given array.
+     * Adheres to the same contract as the Java standard library method
+     * list.indexOf(Object o), but works over String arrays.
      */
     private int indexOf(String string, String[] strings) {
         for (int i = 0; i < strings.length; i++)
             if (strings[i].equals(string)) return i;
         return -1;
-    }
-
-    /**
-     * HELPER: used to compute p(x) lg p(x) for entropy
-     */
-    private double xlogx(double x) {
-        return x == 0 ? 0 : x * Math.log(x) / LOG2;
     }
 
     /**
@@ -216,8 +238,6 @@ class ID3 {
                 if (index == stringCount[attr]) labels[attr][stringCount[attr]++] = data[ex][attr];
             }
         }
-
-        classCount = stringCount[attributes - 1];
     }
 
     /**
@@ -236,8 +256,7 @@ class ID3 {
      * on each line, and returns a two dimensional array of these values,
      * indexed by line number and position in line.
      */
-    // todo change back to private
-    public static String[][] parseCSV(String fileName) throws FileNotFoundException, IOException {
+    private static String[][] parseCSV(String fileName) throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
 
         // compute number of fields per line and number of lines
@@ -342,19 +361,28 @@ class ID3 {
         private List<List<String>> attributes;
         private List<Example> examples;
 
+
+        /**
+         * Constructs a Dataset from trainingData[][] and labels[][] matrices, where both
+         * matrices are formatted as produced by the method indexStrings().
+         *
+         * @param trainingData examples
+         * @param labels attribute and class labels
+         */
         Dataset(String[][] trainingData, String[][] labels) {
+            // extract examples from trainingData[][], first row skipped as it contains column names
             examples = new ArrayList<>();
             for (int i = 1; i < trainingData.length; i++) {
                 String[] example = trainingData[i];
                 examples.add(new Example(example));
             }
 
+            // extract attributes from labels[][] matrix
             attributes = new ArrayList<>();
-
             for (int i = 0; i < labels.length; i++) {
                 // class labels
                 if (i == labels.length - 1) classes = new ArrayList<>(Arrays.asList(labels[i]));
-                    // attribute labels
+                // attribute labels
                 else attributes.add(new ArrayList<>(Arrays.asList(labels[i])));
             }
 
@@ -363,6 +391,13 @@ class ID3 {
             attributes.forEach(attribute -> attribute.removeAll(Collections.singleton(null)));
         }
 
+        /**
+         * Private constructor for internal use.
+         *
+         * @param classes list of class labels
+         * @param attributes list of attribute labels
+         * @param examples data points
+         */
         private Dataset(List<String> classes, List<List<String>> attributes, List<Example> examples) {
             this.classes = classes;
             this.attributes = attributes;
@@ -511,6 +546,14 @@ class ID3 {
                     + "==============================================================";
         }
 
+        /**
+         * HELPER: used to compute p(x) lg p(x) for entropy
+         */
+        private double xlogx(double x) {
+            return x == 0 ? 0 : x * Math.log(x) / LOG2;
+        }
+
+
         private class Example {
             String[] attributes;
             String exampleClass;
@@ -522,10 +565,6 @@ class ID3 {
                 System.arraycopy(data, 0, attributes, 0, data.length - 1);
             }
 
-            Example(String exampleClass, String[] attributes) {
-                this.exampleClass = exampleClass;
-                this.attributes = attributes;
-            }
 
             String cls() {
                 return exampleClass;
