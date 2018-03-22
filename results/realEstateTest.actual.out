@@ -1,1 +1,61 @@
-Error: Attempted to print null Tree
+0.9709505944546688
+0.0
+0.9709505944546688
+Attribute 0 has information gain 0.24674981977443888
+1.0
+0.7219280948873623
+0.9709505944546688
+Attribute 1 has information gain 0.049972141048476915
+0.9852281360342516
+0.5916727785823274
+Attribute 2 has information gain 0.15183550136234136
+0.8112781244591328
+1.0
+Attribute 3 has information gain 0.04812703040826927
+0.0
+0.0
+1.0
+Attribute 1 has information gain 0.5709505944546688
+0.0
+0.0
+Attribute 2 has information gain 0.9709505944546688
+0.9182958340544896
+1.0
+Attribute 3 has information gain 0.019973094021975113
+0.0
+0.9182958340544896
+1.0
+Attribute 1 has information gain 0.019973094021975113
+1.0
+0.9182958340544896
+Attribute 2 has information gain 0.019973094021975113
+0.0
+0.0
+Attribute 3 has information gain 0.9709505944546688
+Location=Suburban
+	Lifestyle=High
+		Class: No
+	Lifestyle=Low
+		Class: Yes
+Location=Rural
+	Class: Yes
+Location=Urban
+	Previous Customer=No
+		Class: Yes
+	Previous Customer=Yes
+		Class: No
+
+No
+No
+Yes
+Yes
+Yes
+No
+Yes
+No
+Yes
+Yes
+Yes
+Yes
+Yes
+No

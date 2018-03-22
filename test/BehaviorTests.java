@@ -1,5 +1,4 @@
 import org.junit.Test;
-import org.junit.Assert.*;
 import org.math.plot.*;
 
 import javax.swing.*;
@@ -15,7 +14,7 @@ public class BehaviorTests {
     private ID3 classifier;
 
 
-    BehaviorTests() {
+    public BehaviorTests() {
         classifier = new ID3();
     }
 
@@ -24,7 +23,7 @@ public class BehaviorTests {
      * Draw learning curve for the learning algorithm.
      */
     @Test
-    void learningCurves() throws IOException {
+    public void learningCurves() throws IOException {
         ID3 classifier = new ID3();
 
         String[][] dataset = ID3.parseCSV("./data/realEstateTrain.csv");
