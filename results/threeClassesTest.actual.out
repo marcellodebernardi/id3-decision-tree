@@ -1,0 +1,45 @@
+Lifestyle=High
+	Location=Suburban
+		Previous Customer=No
+			Class: No
+		Previous Customer=Yes
+			Class: Maybe
+	Location=Rural
+		House Type=Detached
+			Class: Yes
+		House Type=Semi-detached
+			Class: Maybe
+		House Type=Terrace
+			Class: Maybe
+	Location=Urban
+		House Type=Detached
+			Class: No
+		House Type=Semi-detached
+			Class: Yes
+		House Type=Terrace
+			Class: No
+Lifestyle=Low
+	Location=Suburban
+		Class: Yes
+	Location=Rural
+		Class: Yes
+	Location=Urban
+		Previous Customer=No
+			Class: Yes
+		Previous Customer=Yes
+			Class: Maybe
+
+No
+Maybe
+Yes
+Yes
+Yes
+Maybe
+Yes
+No
+Yes
+Yes
+Yes
+Maybe
+Yes
+No

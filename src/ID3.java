@@ -219,9 +219,9 @@ class ID3 {
      * list.indexOf(Object o), but works over String arrays.
      */
     private int indexOf(String name, String[] strings) {
-        for (int i = 0; i < strings.length; i++) {
+        for (int i = 0; i < strings.length; i++)
+            // trimming names because some tests had whitespace character issues
             if (name.trim().equals(strings[i].trim())) return i;
-        }
         return -1;
     }
 
@@ -589,9 +589,13 @@ class ID3 {
         }
 
 
+        /**
+         * Internal class to Dataset. Represents a single data point in a
+         * dataset.
+         */
         private class Example {
-            String[] attributes;
-            String exampleClass;
+            private String[] attributes;
+            private String exampleClass;
 
 
             Example(String[] data) {
@@ -601,10 +605,20 @@ class ID3 {
             }
 
 
+            /**
+             * Returns the class of the example.
+             * @return class name
+             */
             String cls() {
                 return exampleClass;
             }
 
+            /**
+             * Returns the value for the attribute identified by the index
+             *
+             * @param index index as defined by indexStrings()
+             * @return value of attribute
+             */
             String attribute(int index) {
                 return attributes[index];
             }

@@ -7,14 +7,22 @@ Location=Rural
 	Class: Yes
 Location=Urban
 	Previous Customer=No
-		Class: Yes
+		Lifestyle=High
+			House Type=Detached
+				Class: No
+			House Type=Semi-detached
+				Class: No
+			House Type=Terrace
+				Class: No
+		Lifestyle=Low
+			Class: Yes
 	Previous Customer=Yes
 		Class: No
 
 No
 No
 Yes
-Yes
+No
 Yes
 No
 Yes

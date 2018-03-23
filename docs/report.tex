@@ -17,26 +17,30 @@ right=25mm, top=20mm, bottom=20mm}
 % document begins here
 \begin{document}
 \section{Structure and Design}
-The decision tree classifier is implemented using the \textbf{iterative dichotomizer 3} algorithm, as outlined in the lecture slides. The algorithm from the lecture slides is improved with an insight on how to handle incomplete datasets drawn from the chapter on learning decision trees in Russel and Norvig's \textit{Artificial Intelligence: A Modern Approach}.
+The decision tree classifier is implemented using the \textbf{iterative dichotomizer 3} algorithm, which is outlined in the lecture slides as well as the course textbook. This implementation is primarily based on the pseudo-code given by Russel and Norvig's chapter on learning decision trees in \textit{Artificial Intelligence: A Modern Approach}.
 
-The \mintinline{java}{ID3} class contains an inner class \mintinline{java}{Dataset}, which is an internal representation of the data passed to the classifier as an argument to the \mintinline{java}{train()} method. It was added to the design to abstract some of the illegible array manipulation logic that otherwise arose in the implementation of the core ID3 algorithm. As a result of this addition, the code for the training phase is much more legible and easier to modify as well as assess for correctness.
+The \mintinline{java}{ID3} class defines the inner class \mintinline{java}{Dataset}, which is an internal representation of the training data and provides useful methods such as \mintinline{java}{entropy()} and \mintinline{java}{splitByAttribute()}. Its role in the design is to abstract most of the illegible array manipulation logic that was otherwise ubiquitous in the implementation of the core ID3 algorithm. As a result of this addition, the training algorithm is much more legible, making it easier to modify as well as check for correctness. The \mintinline{java}{Dataset} object is constructed prior to training, from the string matrices produced by the provided method \mintinline{java}{indexStrings()}. The design could be improved by modifying \mintinline{java}{indexStrings()} to produce a \mintinline{java}{Dataset} object directly, rather than use the default string matrices as an intermediate representation.
+
+The implementation is written in Java 8 and requires the \mintinline{java}{jdk 1.8.x} to compile; this is available on the ITL machines. Furthermore, the coursework specification is somewhat ambiguous on how the classifier should produce its output; however, the only reasonable solution is printing to standard output.
 
 
 \subsection{Training}
-The \mintinline{java}{train()} method wraps a call to the recursive \mintinline{java}{id3()} method, which constructs the decision tree using the pre-defined \mintinline{java}{TreeNode} data structure. The method recurses on increasingly small subsets of the original dataset and increasingly reduced sets of remaining attributes to split the dataset on. At each level of recursion, four cases can be encountered:
+The \mintinline{java}{train()} method wraps a call to the recursive \mintinline{java}{id3()} method, which constructs the decision tree using the pre-defined \mintinline{java}{TreeNode} data structure. The method recurses on increasingly small subsets of the original dataset with an increasingly reduced set of attributes to split the dataset on. At each level of recursion, four cases can be encountered:
 
 \begin{enumerate}
-\item There are no more attributes to split the dataset by
-\item All examples in the remaining dataset have the same class
-\item There are no examples in this subdivision of the dataset
-\item None of the above apply
+\item All examples in the remaining dataset have the same class (base case)
+\item There are no more attributes to split the dataset by (base case)
+\item There are no examples in this subdivision of the dataset (base case)
+\item None of the above apply (recursive case)
 \end{enumerate}
+
+The implementation bundles the last two cases together, checking for empty subdivisions when they are created, rather than when being recursively called on one. This way it is not necessary to pass a node's majority class as an argument to the recursive call (see lines 158-161).
 
 
 \subsection{Classification}
-Classification is carried out using the stored \mintinline{java}{TreeNode} data structure. Each node in this data structure has a \mintinline{java}{value} attribute; for inner node this represents the attribute based on which to make a decision, while for leaf nodes it represents the classification result. The \mintinline{java}{classify()} method recursively traverses the decision tree, at each node selecting the node's child that matches the example's value for the current node's attribute.
+Classification is carried out using the stored \mintinline{java}{TreeNode} data structure. Each node in this data structure has a \mintinline{java}{value} attribute; for inner nodes this represents the attribute to check, while for leaf nodes it represents the classification result. The \mintinline{java}{classify()} method recursively traverses the decision tree, at each node recursing on the child that matches the example's value for the current node's attribute, until a leaf node is reached.
 
 \subsection{Testing}
-The implementation was tested on the provided simple tests. Further tests were developed by modifying the provided tests to include a number of edge cases, including the ones suggested in the coursework sheet, as well as the "no examples in this subdivision" case.
+The implementation was tested on the provided simple tests, as well as for modified version of the real estate dataset. These modified datasets covered cases such as the presence of more than two classes, the presence of only a single class, datasets that cannot be perfectly classified, and incomplete datasets. In the case of datasets that could not be perfectly classified, decision trees with obvious opportunities for pruning were observed.
 
 \end{document}
