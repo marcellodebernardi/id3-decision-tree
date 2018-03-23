@@ -1,27 +1,51 @@
 Location=Suburban
+Testing index of Suburban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
 	Lifestyle=High
 		Class: No
+Testing index of High in [High, Low, null, null, null, null, null, null, null, null, null, null, null, null, null]
 	Lifestyle=Low
 		Class: Yes
+Testing index of Suburban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
 Location=Rural
 	Class: Yes
+Testing index of High in [High, Low, null, null, null, null, null, null, null, null, null, null, null, null, null]
 Location=Urban
 	Previous Customer=No
+Testing index of Rural in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
 		Class: Yes
+Testing index of Urban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
 	Previous Customer=Yes
+Testing index of No in [No, Yes, null, null, null, null, null, null, null, null, null, null, null, null, null]
 		Class: No
 
+Testing index of Urban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
 No
-No
-Yes
-Yes
-Yes
-No
-Yes
+Testing index of No in [No, Yes, null, null, null, null, null, null, null, null, null, null, null, null, null]
 No
 Yes
 Yes
 Yes
-Yes
+No
 Yes
 No
+Testing index of Urban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
+Yes
+Testing index of Yes in [No, Yes, null, null, null, null, null, null, null, null, null, null, null, null, null]
+Yes
+Testing index of Rural in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
+Yes
+Testing index of Suburban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
+Yes
+Testing index of High in [High, Low, null, null, null, null, null, null, null, null, null, null, null, null, null]
+Yes
+Testing index of Suburban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
+No
+Testing index of Low in [High, Low, null, null, null, null, null, null, null, null, null, null, null, null, null]
+Testing index of Urban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
+Testing index of No in [No, Yes, null, null, null, null, null, null, null, null, null, null, null, null, null]
+Testing index of Suburban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
+Testing index of Low in [High, Low, null, null, null, null, null, null, null, null, null, null, null, null, null]
+Testing index of Rural in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
+Testing index of Rural in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
+Testing index of Urban in [Suburban, Rural, Urban, null, null, null, null, null, null, null, null, null, null, null, null]
+Testing index of Yes in [No, Yes, null, null, null, null, null, null, null, null, null, null, null, null, null]

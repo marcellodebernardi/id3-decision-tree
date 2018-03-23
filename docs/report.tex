@@ -37,8 +37,6 @@ The \mintinline{java}{train()} method wraps a call to the recursive \mintinline{
 Classification is carried out using the stored \mintinline{java}{TreeNode} data structure. Each node in this data structure has a \mintinline{java}{value} attribute; for inner node this represents the attribute based on which to make a decision, while for leaf nodes it represents the classification result. The \mintinline{java}{classify()} method recursively traverses the decision tree, at each node selecting the node's child that matches the example's value for the current node's attribute.
 
 \subsection{Testing}
-The implementation was tested on the provided simple tests. Further tests were developed by modifying the provided tests to include a number of edge cases.
-
-
+The implementation was tested on the provided simple tests. Further tests were developed by modifying the provided tests to include a number of edge cases, including the ones suggested in the coursework sheet, as well as the "no examples in this subdivision" case.
 
 \end{document}

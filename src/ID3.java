@@ -218,9 +218,10 @@ class ID3 {
      * Adheres to the same contract as the Java standard library method
      * list.indexOf(Object o), but works over String arrays.
      */
-    private int indexOf(String string, String[] strings) {
-        for (int i = 0; i < strings.length; i++)
-            if (strings[i].equals(string)) return i;
+    private int indexOf(String name, String[] strings) {
+        for (int i = 0; i < strings.length; i++) {
+            if (name.trim().equals(strings[i].trim())) return i;
+        }
         return -1;
     }
 
