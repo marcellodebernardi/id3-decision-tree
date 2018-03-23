@@ -1,10 +1,11 @@
 % document class and packages
-\documentclass[12pt, titlepage]{article}
+\documentclass[10pt, titlepage]{article}
 \usepackage{pgfgantt}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{rotating}
 \usepackage[nottoc,numbib]{tocbibind}
+\usepackage{minted}
 
 % settings
 \geometry{a4paper, total={170mm,257mm}, left=25mm,
@@ -15,14 +16,29 @@ right=25mm, top=20mm, bottom=20mm}
 
 % document begins here
 \begin{document}
+\section{Structure and Design}
+The decision tree classifier is implemented using the \textbf{iterative dichotomizer 3} algorithm, as outlined in the lecture slides. The algorithm from the lecture slides is improved with an insight on how to handle incomplete datasets drawn from the chapter on learning decision trees in Russel and Norvig's \textit{Artificial Intelligence: A Modern Approach}.
 
-\section{Iterative Dichotomizer 3}
+The \mintinline{java}{ID3} class contains an inner class \mintinline{java}{Dataset}, which is an internal representation of the data passed to the classifier as an argument to the \mintinline{java}{train()} method. It was added to the design to abstract some of the illegible array manipulation logic that otherwise arose in the implementation of the core ID3 algorithm. As a result of this addition, the code for the training phase is much more legible and easier to modify as well as assess for correctness.
 
 
-\section{Classification}
+\subsection{Training}
+The \mintinline{java}{train()} method wraps a call to the recursive \mintinline{java}{id3()} method, which constructs the decision tree using the pre-defined \mintinline{java}{TreeNode} data structure. The method recurses on increasingly small subsets of the original dataset and increasingly reduced sets of remaining attributes to split the dataset on. At each level of recursion, four cases can be encountered:
+
+\begin{enumerate}
+\item There are no more attributes to split the dataset by
+\item All examples in the remaining dataset have the same class
+\item There are no examples in this subdivision of the dataset
+\item None of the above apply
+\end{enumerate}
 
 
-\section{Testing}
+\subsection{Classification}
+Classification is carried out using the stored \mintinline{java}{TreeNode} data structure. Each node in this data structure has a \mintinline{java}{value} attribute; for inner node this represents the attribute based on which to make a decision, while for leaf nodes it represents the classification result. The \mintinline{java}{classify()} method recursively traverses the decision tree, at each node selecting the node's child that matches the example's value for the current node's attribute.
+
+\subsection{Testing}
+The implementation was tested on the provided simple tests. Further tests were developed by modifying the provided tests to include a number of edge cases.
+
 
 
 \end{document}

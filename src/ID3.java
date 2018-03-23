@@ -13,12 +13,12 @@ import java.util.stream.IntStream;
 
 class ID3 {
     static final double LOG2 = Math.log(2.0);
-    private int attributes;             // Number of attributes (including the class)
+    private int attributes;             // attribute number (including class)
     private int examples;               // Number of training examples
-    private TreeNode decisionTree;      // Tree learnt in training, used for classifying
-    private String[][] data;            // Training data indexed by example, attribute
+    private TreeNode decisionTree;      // Tree learnt in training
+    private String[][] data;            // data indexed as [example, attribute]
     private String[][] labels;          // Unique labels for each attribute
-    private int[] stringCount;          // Number of unique labels for each attribute
+    private int[] stringCount;          // Number of unique labels
 
 
     /**
@@ -41,8 +41,10 @@ class ID3 {
      * @throws FileNotFoundException if file not found
      * @throws IOException           generic IO exception
      */
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-        if (args.length != 2) error("Expected 2 arguments: file names of training and test data");
+    public static void main(String[] args)
+            throws FileNotFoundException, IOException {
+        if (args.length != 2)
+            error("Expected 2 arguments: file names of training and test data");
 
         String[][] trainingData = parseCSV(args[0]);
         String[][] testData = parseCSV(args[1]);
@@ -63,12 +65,14 @@ class ID3 {
     public void train(String[][] trainingData) {
         indexStrings(trainingData);
 
-        // after calling indexStrings(), trainingData[][] is converted to a Dataset
-        // object which abstracts array manipulations in order to make the code
-        // directly implementing ID3 more legible
+        // after calling indexStrings(), trainingData[][] is converted to a
+        // Dataset object which abstracts array manipulations in order to make
+        // the code directly implementing ID3 more legible
         decisionTree = id3(
                 new Dataset(data, labels),
-                IntStream.range(0, labels.length - 1).boxed().collect(Collectors.toList())
+                IntStream.range(0, labels.length - 1)
+                        .boxed()
+                        .collect(Collectors.toList())
         );
     }
 
@@ -79,7 +83,8 @@ class ID3 {
      * @param testData 2D array of data points, indexed as [example][attribute]
      */
     public void classify(String[][] testData) {
-        if (decisionTree == null) error("Please run training phase before classification");
+        if (decisionTree == null)
+            error("Please run training phase before classification");
 
         String[] classes = labels[attributes - 1];
         for (int i = 1; i < testData.length; i++)
@@ -96,31 +101,36 @@ class ID3 {
 
 
     /**
-     * Recursively computes a class for the given example by traversing the decision
-     * tree.
+     * Recursively computes a class for the given example by traversing the
+     * decision tree.
      *
      * @param example data point to classify
-     * @param node    node from which to classify, should be root for initial call
+     * @param node    node from which to classify, pass root for initial call
      * @return class of data point
      */
     private int classify(String[] example, TreeNode node) {
         // leaf node
-        if (node.children == null || node.children.length == 0) return node.value;
-            // non-leaf node
-        else return classify(example, node.children[indexOf(example[node.value], labels[node.value])]);
+        if (node.children == null || node.children.length == 0)
+            return node.value;
+        // inner node
+        else
+            return classify(
+                    example,
+                    node.children[indexOf(example[node.value], labels[node.value])]
+            );
     }
 
     /**
      * Executes the iterative dichotomizer 3 algorithm on the training dataset.
-     * Returns the root node of the resulting decision tree. The attributeIndices
+     * Returns root node of the resulting decision tree. The attributeIndices
      * parameter is used to indicate which attributes are still to be tested at
      * the current sub-tree.
      * <p>
      * That is, for example, if the data set originally had
-     * 4 distinct attributes, and attribute 3 has already been used, the argument
+     * 4 distinct attributes, and attribute 3 has been used, the argument
      * to attributeIndices should be [0, 1, 2].
      *
-     * @param dataset          Dataset object representing data points to elicit nodes for
+     * @param dataset          data points to elicit nodes for
      * @param attributeIndices remaining attributes for splitting
      * @return TreeNode representing decision tree
      */
@@ -141,7 +151,8 @@ class ID3 {
             attributeIndices = new ArrayList<>(attributeIndices);
             attributeIndices.remove((Integer) question);
 
-            // if a subset is empty make leaf node with current majority class, else recurse
+            // empty subset -> make leaf node with current majority class
+            // else recurse
             TreeNode[] children = new TreeNode[subsets.size()];
 
             for (int i = 0; i < children.length; i++)
@@ -184,7 +195,7 @@ class ID3 {
      * attribute. Used to select the next best attribute to split on in the
      * decision tree.
      *
-     * @param data dataset to split
+     * @param data           dataset to split
      * @param attributeIndex attribute to split with
      * @return information gained by splitting with this attribute
      */
@@ -194,7 +205,9 @@ class ID3 {
 
         // sum of entropy of each subset
         for (Dataset subset : subsets)
-            subsetsEntropy += ((double) subset.size() / (double) data.size()) * subset.entropy();
+            subsetsEntropy +=
+                    ((double) subset.size() / (double) data.size())
+                    * subset.entropy();
 
         // overall change in entropy from splitting on this attribute
         return data.entropy() - subsetsEntropy;
@@ -235,7 +248,8 @@ class ID3 {
                     if (data[ex][attr].equals(labels[attr][index])) break;
 
                 // new string found
-                if (index == stringCount[attr]) labels[attr][stringCount[attr]++] = data[ex][attr];
+                if (index == stringCount[attr])
+                    labels[attr][stringCount[attr]++] = data[ex][attr];
             }
         }
     }
@@ -256,7 +270,8 @@ class ID3 {
      * on each line, and returns a two dimensional array of these values,
      * indexed by line number and position in line.
      */
-    private static String[][] parseCSV(String fileName) throws FileNotFoundException, IOException {
+    private static String[][] parseCSV(String fileName)
+            throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
 
         // compute number of fields per line and number of lines
@@ -337,8 +352,7 @@ class ID3 {
                             .append(children[i].toString(indent + '\t'));
                 }
                 return s.toString();
-            }
-            else {
+            } else {
                 return indent + "Class: " + labels[attributes - 1][value] + "\n";
             }
         }
@@ -346,15 +360,16 @@ class ID3 {
 
 
     /**
-     * The Dataset class partially abstracts the details of classes, attributes, examples,
-     * and their handling during the training phase. Its purpose is to make the implementation
-     * of the ID3 algorithm more legible.
+     * The Dataset class partially abstracts the details of classes, attributes,
+     * examples, and their handling during the training phase. Its purpose is
+     * to make the implementation of the ID3 algorithm more legible.
      * <p>
-     * A Dataset represents a collection of example data points, and a set of attributes
-     * and classes defining the space within which those data points reside. A Dataset object
-     * provides methods for querying the dataset's properties and manipulating it. In particular,
-     * the computation of a dataset's entropy, as well as the splitting of a dataset into
-     * subsets based on some attribute are implemented in this class.
+     * A Dataset represents a collection of example data points, and a set of
+     * attributes and classes defining the space within which those data points
+     * reside. A Dataset object provides methods for querying the dataset's
+     * properties and manipulating it. In particular, the computation of a
+     * dataset's entropy, as well as the splitting of a dataset into subsets
+     * based on some attribute are implemented in this class.
      */
     private class Dataset {
         private List<String> classes;
@@ -363,14 +378,16 @@ class ID3 {
 
 
         /**
-         * Constructs a Dataset from trainingData[][] and labels[][] matrices, where both
-         * matrices are formatted as produced by the method indexStrings().
+         * Constructs a Dataset from trainingData[][] and labels[][] matrices,
+         * where both matrices are formatted as produced by the method
+         * indexStrings().
          *
          * @param trainingData examples
-         * @param labels attribute and class labels
+         * @param labels       attribute and class labels
          */
         Dataset(String[][] trainingData, String[][] labels) {
-            // extract examples from trainingData[][], first row skipped as it contains column names
+            // extract examples from trainingData[][]
+            // first row skipped as it contains column names
             examples = new ArrayList<>();
             for (int i = 1; i < trainingData.length; i++) {
                 String[] example = trainingData[i];
@@ -381,24 +398,27 @@ class ID3 {
             attributes = new ArrayList<>();
             for (int i = 0; i < labels.length; i++) {
                 // class labels
-                if (i == labels.length - 1) classes = new ArrayList<>(Arrays.asList(labels[i]));
-                // attribute labels
+                if (i == labels.length - 1)
+                    classes = new ArrayList<>(Arrays.asList(labels[i]));
+                    // attribute labels
                 else attributes.add(new ArrayList<>(Arrays.asList(labels[i])));
             }
 
             // remove nulls (the labels[][] matrix usually contains null cells)
             classes.removeAll(Collections.singleton(null));
-            attributes.forEach(attribute -> attribute.removeAll(Collections.singleton(null)));
+            attributes.forEach(attribute
+                    -> attribute.removeAll(Collections.singleton(null)));
         }
 
         /**
          * Private constructor for internal use.
          *
-         * @param classes list of class labels
+         * @param classes    list of class labels
          * @param attributes list of attribute labels
-         * @param examples data points
+         * @param examples   data points
          */
-        private Dataset(List<String> classes, List<List<String>> attributes, List<Example> examples) {
+        private Dataset(List<String> classes, List<List<String>> attributes,
+                        List<Example> examples) {
             this.classes = classes;
             this.attributes = attributes;
             this.examples = examples;
@@ -442,8 +462,8 @@ class ID3 {
         }
 
         /**
-         * Returns new datasets obtained by splitting the current dataset by its values
-         * for the given attribute.
+         * Returns new datasets obtained by splitting the current dataset
+         * by its values for the given attribute.
          *
          * @param attributeIndex the attribute to use for splitting
          * @return list of new datasets
@@ -537,9 +557,10 @@ class ID3 {
         }
 
         /**
-         * Returns the class index for the class of the first data point in the dataset.
-         * Useful when dataset is perfectly classified and it is unnecessary to iterate
-         * again over entire dataset to determine majority class.
+         * Returns the class index for the class of the first data point in the
+         * dataset. Useful when dataset is perfectly classified and it is
+         * unnecessary to iterate again over entire dataset to determine
+         * majority class.
          *
          * @return class index for first data point's class
          */
@@ -549,12 +570,14 @@ class ID3 {
 
         @Override
         public String toString() {
-            return "\nDATASET (" + size() + " examples, " + classesSize() + "classes, "
+            return "\nDATASET ("
+                    + size() + " examples, "
+                    + classesSize() + "classes, "
                     + attributesSize() + " attributes):\n"
                     + "Classes: " + classes.toString() + "\n"
                     + "Attributes: " + attributes.toString() + "\n"
                     + "Examples: " + examples.toString() + "\n"
-                    + "==============================================================";
+                    + "=======================================================";
         }
 
         /**
